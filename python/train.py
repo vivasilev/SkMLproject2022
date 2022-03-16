@@ -4,19 +4,19 @@ import numpy as np
 from tqdm import tqdm
 
 
-def train(device, num_strings, batch_size, 
-          synt_net, rec_net, 
-          criterion, optimizer, epochs, n):
-    
+def train(device, background_dataloader,
+          synt_net, rend_net, rec_net, 
+          criterion, optimizer, epochs, n, m):
+
     for epoch in tqdm(range(epochs)):
         running_loss = 0.0
         accuracy = torch.tensor([])
         
-        for i in (range(int(num_strings / batch_size))):
-            
+        #for i in (range(int(num_strings / batch_size))):
+        for batch in background_dataloader:
             # generate batch with random bit strings
             input_bit_string_batch = torch.tensor(
-                np.random.choice([-1, 1], size=(batch_size, n))
+                np.random.choice([-1, 1], size=(len(batch), n))
             ).to(device)
             
             # zero the parameter gradients
@@ -24,7 +24,12 @@ def train(device, num_strings, batch_size,
 
             # forward + backward + optimize
             synt_outputs = synt_net(input_bit_string_batch)
-            rec_outputs = rec_net(synt_outputs)
+            synt_outputs_with_background = batch.clone()
+            synt_outputs_with_background[:, :, (m // 2):(m + m//2),\
+                                         (m // 2):(m + m//2)] = synt_outputs
+            rend_outputs = rend_net(synt_outputs_with_background)
+            #rend_outputs = rend_net(synt_outputs)
+            rec_outputs = rec_net(rend_outputs)
             
             #print('input: ', input_bit_string_batch[0])
             #print('rec: ', torch.sign(rec_outputs[0]))
@@ -56,4 +61,5 @@ def train(device, num_strings, batch_size,
         print('Loss: ', running_loss)
         print('Mean accuracy: {}\n'.format(torch.mean(accuracy / n)))
 
+    print('Finished Training')
 
