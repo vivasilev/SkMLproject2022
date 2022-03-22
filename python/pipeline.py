@@ -7,7 +7,7 @@ from torch.utils.data import DataLoader
 
 from itertools import chain
 
-from nets import Synthesizer, Recognizer, Renderer
+from nets import Synthesizer, Recognizer, Renderer, MakeFaces
 from test import test
 from train import train
 
@@ -29,6 +29,7 @@ weight_decay = 1e-5
 synt_net_name = '../trained_nets/synt_net.pth'
 rend_net_name = '../trained_nets/rend_net.pth'
 rec_net_name = '../trained_nets/rec_net.pth'
+gen_net_name = '../trained_nets/gen_net.pth'
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -49,26 +50,30 @@ def training_pipeline(save=True):
 	synt_net = Synthesizer(n, m)
 	rend_net = Renderer(background_size)
 	rec_net = Recognizer(n)
+	gen_net = MakeFaces(m, device)
 	
 	synt_net.to(device)
 	rend_net.to(device)
 	rec_net.to(device)
+	gen_net.to(device)
 	
 	criterion = nn.Sigmoid()
 	
-	params = chain(synt_net.parameters(), rend_net.parameters(), rec_net.parameters())
+	params = chain(synt_net.parameters(), gen_net.parameters(), rend_net.parameters(), rec_net.parameters())
 	optimizer = optim.Adam(params, lr=lr, weight_decay=weight_decay)
 	
 	print('Start training')
 	train(device, background_dataloader_train, 
-                synt_net, rend_net, rec_net, 
+                synt_net, gen_net, rend_net, rec_net, 
                 criterion, optimizer, epochs, n, m)
 	print('Finish training')
         
+	torch.save(gen_net.state_dict(), gen_net_name)
 	if save:
                 torch.save(synt_net.state_dict(), synt_net_name)
                 torch.save(rend_net.state_dict(), rend_net_name)
                 torch.save(rec_net.state_dict(), rec_net_name)
+                torch.save(gen_net.state_dict(), gen_net_name)
 
 
 def testing_pipeline():
@@ -87,24 +92,28 @@ def testing_pipeline():
 	synt_net = Synthesizer(n, m)
 	rend_net = Renderer(background_size)
 	rec_net = Recognizer(n)
+	gen_net = MakeFaces(m, device)
 
 	synt_net.load_state_dict(torch.load(synt_net_name))
 	rend_net.load_state_dict(torch.load(rend_net_name))
 	rec_net.load_state_dict(torch.load(rec_net_name))
+	gen_net.load_state_dict(torch.load(gen_net_name))
 	
 	synt_net.to(device)
 	rend_net.to(device)
 	rec_net.to(device)
+	gen_net.to(device)
         
 	synt_net.eval()
 	rend_net.eval()
 	rec_net.eval()
+	gen_net.eval()
 
 	print('Start testing')
 	test(device, background_dataloader_test, 
-                synt_net, rend_net, rec_net, n, m)
+                synt_net, gen_net, rend_net, rec_net, n, m)
 
 if __name__ == '__main__':
-        training_pipeline()
+        training_pipeline(False)
         testing_pipeline()
 
