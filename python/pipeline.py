@@ -68,7 +68,6 @@ def training_pipeline(save=True):
                 criterion, optimizer, epochs, n, m)
 	print('Finish training')
         
-	torch.save(gen_net.state_dict(), gen_net_name)
 	if save:
                 torch.save(synt_net.state_dict(), synt_net_name)
                 torch.save(rend_net.state_dict(), rend_net_name)
