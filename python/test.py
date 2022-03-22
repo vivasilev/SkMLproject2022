@@ -5,7 +5,7 @@ from tqdm import tqdm
 
 
 def test(device, background_dataloader,
-         synt_net, rend_net, rec_net, n, m):
+         synt_net, gen_net, rend_net, rec_net, n, m):
     
     errors = torch.tensor([])
     
@@ -20,12 +20,12 @@ def test(device, background_dataloader,
             
             # calculate outputs
             synt_outputs = synt_net(input_bit_string_batch)
-            #superimposing
-            synt_outputs_with_background = batch.clone()
-            synt_outputs_with_background[:, :, (m // 2):(m + m//2),\
-                                         (m // 2):(m + m//2)] = synt_outputs
+            gan_outputs = gen_net(synt_outputs)
+            gan_outputs_with_background = batch.clone()
+            gan_outputs_with_background[:, :, (m // 2):(m + m//2),\
+            		(m // 2):(m + m//2)] = gan_outputs
+            rend_outputs = rend_net(gan_outputs_with_background)
             #rend_outputs = rend_net(synt_outputs)
-            rend_outputs = rend_net(synt_outputs_with_background)
             rec_outputs = rec_net(rend_outputs)
                         
             # calculate accuracy
