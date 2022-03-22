@@ -7,15 +7,13 @@ from dpipe.io import load
 from .architecture import Generator
 
 
-def predict(n, device, model_path, params_path, nz=100):
+def predict(input, device, model_path, params_path):
     params = load(params_path)
     net = Generator(params).to(device)
     net.load_state_dict(torch.load(model_path))
 
-    noise = torch.randn(n, nz, 1, 1, device=device)
-
     with torch.no_grad():
-        img = net(noise).detach().cpu()
+        img = net(input[..., None, None].to(device)).detach().cpu()
 
     return img
 
