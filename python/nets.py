@@ -99,11 +99,13 @@ class Renderer(nn.Module):
             g = float(np.random.uniform(0.001, 0.003, 1))
             Jahne_sigma = float(np.random.uniform(0.001, 0.3, 1))
             
-            print(torch.mean(x[i], axis=[1, 2]))
+            # print(torch.mean(x[i], axis=[1, 2]))
             std = torch.sqrt(g * torch.mean(x[i], axis=[1, 2]) + Jahne_sigma ** 2)
             for j in range(x[i].shape[0]):
-                x[i][j] = x[i][j] +\
-                    torch.normal(torch.zeros(self.size, self.size), torch.full((self.size, self.size), float(std[j])))
+                std_j = 0.1 if torch.isnan(std[j]) else float(std[j])
+                x[i][j] = x[i][j] + torch.normal(
+                    torch.zeros(self.size, self.size), torch.full((self.size, self.size), std_j)
+                )
         
         # color transformation
         x = self.color_jitter(x)

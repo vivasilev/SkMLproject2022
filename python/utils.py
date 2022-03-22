@@ -19,6 +19,7 @@ class COCOval(Dataset):
     '''
     MS COCO validation images without annotation
     '''
+
     def __init__(self, size, root_dir, transform=None):
         '''
         Args:
@@ -42,9 +43,8 @@ class COCOval(Dataset):
                                 os.listdir(self.root_dir)[idx])
         image = io.imread(img_name)
         image = transform.resize(image, (self.size, self.size))
-        
+
         if self.transform:
             image = self.transform(image)
 
         return image
-
