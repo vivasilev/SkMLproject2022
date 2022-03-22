@@ -6,7 +6,7 @@ from tqdm import tqdm
 
 def test(device, background_dataloader,
          synt_net, gen_net, rend_net, rec_net, n, m):
-    errors = torch.tensor([])
+    errors = torch.tensor([]).to(device)
 
     # since we're not training, we don't need to calculate the gradients for our outputs
     with torch.no_grad():
@@ -25,7 +25,7 @@ def test(device, background_dataloader,
             (m // 2):(m + m // 2)] = gan_outputs
             rend_outputs = rend_net(gan_outputs_with_background)
             # rend_outputs = rend_net(synt_outputs)
-            rec_outputs = rec_net(rend_outputs)
+            rec_outputs = rec_net(rend_outputs.to(device))
 
             # calculate accuracy
             errors = torch.cat([
