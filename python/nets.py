@@ -5,7 +5,7 @@ import numpy as np
 import kornia as K
 
 from utils import Reshape
-
+from dcgan.inference import predict
 
 class Reshape(nn.Module):
     def __init__(self, *args):
@@ -98,6 +98,8 @@ class Renderer(nn.Module):
             # same parameters for each channel
             g = float(np.random.uniform(0.001, 0.003, 1))
             Jahne_sigma = float(np.random.uniform(0.001, 0.3, 1))
+            
+            print(torch.mean(x[i], axis=[1, 2]))
             std = torch.sqrt(g * torch.mean(x[i], axis=[1, 2]) + Jahne_sigma ** 2)
             for j in range(x[i].shape[0]):
                 x[i][j] = x[i][j] +\
@@ -111,3 +113,24 @@ class Renderer(nn.Module):
         x = K.filters.gaussian_blur2d(x, (3, 3), (blur_sigma, blur_sigma))
         return x
 
+
+class MakeFaces(nn.Module):
+    def __init__(self, m, device):
+        super(MakeFaces, self).__init__()
+        self.reshape = Reshape(-1, 3072)
+        self.linear = nn.Linear(3072, 100)
+        self.device = device
+        self.m = m
+        
+    def forward(self, x):
+        x = self.reshape(x)
+        x = self.linear(x.float())
+        
+        x = predict(x, device=self.device, 
+              model_path='../trained_nets/generator.pth', 
+              params_path='../python/dcgan/params.json')
+        
+        x = K.geometry.transform.scale(x,
+            scale_factor=torch.full((x.shape[0], 1), 0.5))
+        x = x[:, :, (self.m // 2):(self.m + self.m//2), (self.m // 2):(self.m + self.m//2)]
+        return x
