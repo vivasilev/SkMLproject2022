@@ -17,4 +17,4 @@ Authors: Viacheslav Vasilev, Farukh Yaushev, Kezhik Kyzylool, Vera Soboleva
 
 To start the training and testing process, go to `python/` and run `python pipeline.py`.
 
-***Attention***: Running using a superimposing requires a `background` directory with image data in the top directory (here). The archive can be found [here](https://drive.google.com/drive/folders/1nQolB0GQWXROYKacWqg0OzaPPw9V6Uxy).
+***Attention***: Running using a superimposing requires a `background` directory with image data in the top directory (here). The archive can be found [here](https://drive.google.com/drive/folders/1nQolB0GQWXROYKacWqg0OzaPPw9V6Uxy). Also, be careful with paths.
