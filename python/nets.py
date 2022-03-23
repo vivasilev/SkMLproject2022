@@ -106,6 +106,7 @@ class Renderer(nn.Module):
                 x[i][j] = x[i][j] + torch.normal(
                     torch.zeros(self.size, self.size), torch.full((self.size, self.size), std_j)
                 )
+                # x[i][j] = torch.clip(x[i][j], 0, 1)
         
         # color transformation
         x = self.color_jitter(x)

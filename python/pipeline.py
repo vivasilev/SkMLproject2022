@@ -21,8 +21,8 @@ resize_source_back = background_size * 2
 
 batch_size = 128
 # num_strings = 1000
-epochs = 500
-lr = 1e-3
+epochs = 250
+lr = 1e-5
 weight_decay = 1e-5
 
 synt_net_name = '../trained_nets/synt_net.pth'
@@ -50,6 +50,11 @@ def training_pipeline(save=True):
     rend_net = Renderer(background_size)
     rec_net = Recognizer(n)
     gen_net = MakeFaces(m, device)
+
+    synt_net.load_state_dict(torch.load(synt_net_name))
+    rend_net.load_state_dict(torch.load(rend_net_name))
+    rec_net.load_state_dict(torch.load(rec_net_name))
+    gen_net.load_state_dict(torch.load(gen_net_name))
 
     synt_net.to(device)
     rend_net.to(device)
