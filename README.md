@@ -15,6 +15,6 @@ Authors: Viacheslav Vasilev, Farukh Yaushev, Kezhik Kyzylool, Vera Soboleva
 
 **photos** - contains code and visualizations of experiments on recognition by the Recognizer network (can be found in `trained_nets/rec_net.pth`) of markers obtained by photographing. Here the Recognizer network was trained in conjunction with the Synthesizer (`trained_nets/synt_net.pth`) and Rendering network (`trained_nets/rend_net.pth`).
 
-To start the training and testing process, go to `python/` and run `python pipeline.py` (be careful with paths in `trained_nets` catalog).
+To start the training and testing process, go to `python/` and run `python pipeline.py`.
 
 ***Attention***: Running using a superimposing requires a `background` directory with image data in the top directory (here). The archive can be found [here](https://drive.google.com/drive/folders/1nQolB0GQWXROYKacWqg0OzaPPw9V6Uxy).
